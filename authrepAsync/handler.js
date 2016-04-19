@@ -5,7 +5,7 @@ var request = require('request');
 var createClient = require('then-redis').createClient
 var Q = require('q');
 
-var client = new Client(process.env.THREESCALE_PROVIDER_ID);
+var client = new Client(process.env.THREESCALE_PROVIDER_KEY);
 var service_id = process.env.THREESCALE_SERVICE_ID
 
 var authRepUserKey = Q.nbind(client.authrep_with_user_key, client);
