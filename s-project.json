@@ -2,5 +2,5 @@
   "name": "sls-threeScale-Authorizer",
   "custom": {
   },
-  "plugins": ["serverless-webpack-plugin"]
+  "plugins": [ "serverless-optimizer-plugin"]
 }

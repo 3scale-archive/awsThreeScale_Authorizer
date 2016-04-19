@@ -10,9 +10,6 @@
     "url": "git://github.com/"
   },
   "dependencies": {
-    "serverless-webpack-plugin": "^0.4.1",
-    "webpack": "^1.13.0"
-  },
-  "devDependencies": {
+    "serverless-optimizer-plugin": "^2.5.1"
   }
 }

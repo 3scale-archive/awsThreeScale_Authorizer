@@ -48,15 +48,6 @@
                 "ec2:DeleteNetworkInterface"
               ],
               "Resource": "*"
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                  "sns:Publish"
-              ],
-              "Resource": [
-                  "arn:aws:sns:us-east-1:768008059984:threescaleAsyncAuth"
-              ]
             }
           ]
         },

@@ -12,6 +12,6 @@
     "redis-commands": "^1.1.0",
     "request": "^2.71.0",
     "then-redis": "^2.0.0",
-    "underscore":"*"
+    "underscore": "*"
   }
 }

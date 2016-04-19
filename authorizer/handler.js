@@ -21,7 +21,7 @@ var db = createClient({
   port: process.env.ELASTICACHE_PORT
 });
 
-exports.handler = (event, context, callback) => {
+exports.handler = function(event, context, callback){
     console.log('Received event:', JSON.stringify(event, null, 2));
     var token = event.authorizationToken;
 
