@@ -1,0 +1,29 @@
+{
+  "name": "authrepAsync",
+  "runtime": "nodejs4.3",
+  "description": "Serverless Lambda function for project: sls-threeScale-Authorizer",
+  "customName": false,
+  "customRole": false,
+  "handler": "handler.handler",
+  "timeout": 6,
+  "memorySize": 1024,
+  "authorizer": {},
+  "custom": {
+    "excludePatterns": []
+  },
+  "endpoints": [],
+  "events": [],
+  "environment": {
+    "SERVERLESS_PROJECT": "${project}",
+    "SERVERLESS_STAGE": "${stage}",
+    "SERVERLESS_REGION": "${region}",
+    "THREESCALE_PROVIDER_ID":"YOUR_3SCALE_PROVIDER_KEY",
+    "THREESCALE_SERVICE_ID":"YOUR_3SCALE_SERVICE_ID",
+    "ELASTICACHE_ENDPOINT":"YOUR_ELASTICACHE_ENDPOINT",
+    "ELASTICACHE_PORT":6379
+  },
+  "vpc": {
+    "securityGroupIds": [""],
+    "subnetIds": [""]
+  }
+}
