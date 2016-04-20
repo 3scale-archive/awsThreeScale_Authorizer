@@ -10,7 +10,9 @@
   "authorizer": {},
   "custom": {
     "excludePatterns": [],
-    "optimize": true
+    "optimize": {
+        "exclude": ["aws-sdk"]
+    }
   },
   "endpoints": [],
   "events": [],
