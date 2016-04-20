@@ -9,7 +9,7 @@ var Q = require('q');
 var _ = require('underscore')
 
 var AWS = require('aws-sdk');
-AWS.config.region = 'us-east-1';
+AWS.config.region = process.env.SERVERLESS_REGION;
 
 var client = new Client(process.env.THREESCALE_PROVIDER_KEY);
 var service_id = process.env.THREESCALE_SERVICE_ID
