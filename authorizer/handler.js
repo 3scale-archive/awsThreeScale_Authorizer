@@ -26,11 +26,11 @@ exports.handler = function(event, context, callback){
     var token = event.authorizationToken;
 
     db.get(token).then(function(value){
-      console.log("Value",value)
       if (value != null) {
-        console.log('exists');
-        console.log(value)
-        // db.del(token)
+        console.log('Token exists in cache, value is',value);
+
+        //Send message on threescaleAsync SNS topic
+        //message contains token
         var sns = new AWS.SNS();
         var message = {token: token}
         sns.publish({
@@ -41,30 +41,21 @@ exports.handler = function(event, context, callback){
                 console.log(err.stack);
                 return;
             }
-            console.log('push sent');
-            console.log(data);
+            console.log('push sent',data);
             context.succeed(generatePolicy('user', 'Allow', event.methodArn));
         });
-
-
-        //Send SNS to topic for asynccall
-
-        //split by column ':' = service, usage
-        //make a call to authreport endpoint (async)
-        //if outof band delete cache
-        //call other lambda
        } else {
-          console.log('does not exist');
+          console.log('Token does not exist in cache');
           auth(token).then(function(result){
-            console.log("AAAA",result);
+            console.log("3scale response",result);
 
             var metrics = _.pluck(result.usage_reports,'metric')
             var cached_key = service_id+":"
             _.each(metrics,function(m){
               cached_key += "usage['"+m+"']=1&"
             })
-            console.log(cached_key);
 
+            //sotre key and its usage in cache
             db.set(token,cached_key);
 
             context.succeed(generatePolicy('user', 'Allow', event.methodArn));
@@ -78,6 +69,7 @@ exports.handler = function(event, context, callback){
     })
 }
 
+//Function  to authenticate against 3scale platform
 function auth(token){
   var options = { 'user_key': token, 'usage': { 'hits': 1 }  };
   var q = Q.defer();
@@ -91,6 +83,7 @@ function auth(token){
   return q.promise;
 }
 
+//Create a AWS Policy document that will be evaluate by the API Gateway
 var generatePolicy = function(principalId, effect, resource) {
     var authResponse = {};
     authResponse.principalId = principalId;

@@ -17,27 +17,30 @@ var db = createClient({
 
 exports.handler = function(event, context, callback) {
   console.log('Received event:', JSON.stringify(event, null, 2));
+
   var token = JSON.parse(event.Records[0].Sns.Message).token;
   auth(token).then(function(result){
-    console.log("AAAA",result);
+    console.log("3scale response",result);
     var metrics = _.pluck(result.usage_reports,'metric')
     var cached_key = service_id+":"
     _.each(metrics,function(m){
       cached_key += "usage['"+m+"']=1&"
     })
-    console.log(cached_key);
 
+    //store in cache
     db.set(token,cached_key);
   }).catch(function(err){
     console.log("ERROR:",err);
+    
+    //delete ken from cache
     db.del(token)
-    // context.succeed(generatePolicy('user', 'Deny', event.methodArn));
   }).done(function(){
     console.log("DONE")
     context.done();
   });
 };
 
+//Function  to authenticate against 3scale platform
 function auth(token){
   var options = { 'user_key': token, 'usage': { 'hits': 1 }  };
   var q = Q.defer();
