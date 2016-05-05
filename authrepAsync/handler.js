@@ -4,6 +4,7 @@ var Client = require('3scale').Client;
 var request = require('request');
 var createClient = require('then-redis').createClient
 var Q = require('q');
+var _ = require('underscore')
 
 var client = new Client(process.env.THREESCALE_PROVIDER_KEY);
 var service_id = process.env.THREESCALE_SERVICE_ID
@@ -31,7 +32,7 @@ exports.handler = function(event, context, callback) {
     db.set(token,cached_key);
   }).catch(function(err){
     console.log("ERROR:",err);
-    
+
     //delete ken from cache
     db.del(token)
   }).done(function(){
