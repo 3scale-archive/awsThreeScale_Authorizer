@@ -17,19 +17,21 @@
     }
   },
   "endpoints": [],
-  "events": [{
-    "name" : "threescaleAsync",
-    "type": "sns",
-    "config": {
-      "topicName": "threescaleAsync"
+  "events": [
+    {
+      "name": "threescaleAsync",
+      "type": "sns",
+      "config": {
+        "topicName": "${stage}-${project}-threescaleAsync"
+      }
     }
-  }],
+  ],
   "environment": {
     "SERVERLESS_PROJECT": "${project}",
     "SERVERLESS_STAGE": "${stage}",
     "SERVERLESS_REGION": "${region}",
     "THREESCALE_PROVIDER_KEY": "YOUR_3SCALE_PROVIDER_KEY",
-    "THREESCALE_SERVICE_ID": YOUR_3SCALE_SERVICE_ID,
+    "THREESCALE_SERVICE_ID": "YOUR_3SCALE_SERVICE_ID",
     "ELASTICACHE_ENDPOINT": "${elastiCacheEndpoint}",
     "ELASTICACHE_PORT": 6379
   },
