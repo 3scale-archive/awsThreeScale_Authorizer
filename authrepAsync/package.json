@@ -12,6 +12,8 @@
     "3scale": "^0.7.2",
     "q": "^1.4.1",
     "request": "^2.71.0",
+    "redis": "^2.5.3",
+    "redis-commands": "^1.1.0",
     "then-redis": "^2.0.0",
     "underscore":"*"
   }
