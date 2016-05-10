@@ -270,7 +270,7 @@
     "SNStopic": {
       "Type": "AWS::SNS::Topic",
       "Properties": {
-        "TopicName": "threescaleAsync"
+        "TopicName": "${stage}-${project}-threescaleAsync"
       }
     }
   },
