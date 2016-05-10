@@ -71,7 +71,7 @@ exports.handler = function(event, context, callback){
 
 //Function  to authenticate against 3scale platform
 function auth(token){
-  var options = { 'user_key': token, 'usage': { 'hits': 1 }  };
+  var options = { 'user_key': token, 'usage': { 'hits': 1 }, 'service_id': process.env.THREESCALE_SERVICE_ID};
   var q = Q.defer();
   client.authrep_with_user_key(options, function (res) {
     if (res.is_success()) {
