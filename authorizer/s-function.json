@@ -1,5 +1,5 @@
 {
-  "name": "authrepAsync",
+  "name": "authorizer",
   "runtime": "nodejs4.3",
   "description": "Serverless Lambda function for project: sls-threeScale-Authorizer",
   "customName": false,
@@ -11,7 +11,9 @@
   "custom": {
     "excludePatterns": [],
     "optimize": {
-        "exclude": ["aws-sdk"]
+      "exclude": [
+        "aws-sdk"
+      ]
     }
   },
   "endpoints": [],
@@ -20,13 +22,18 @@
     "SERVERLESS_PROJECT": "${project}",
     "SERVERLESS_STAGE": "${stage}",
     "SERVERLESS_REGION": "${region}",
-    "THREESCALE_PROVIDER_KEY":"YOUR_3SCALE_PROVIDER_KEY",
-    "THREESCALE_SERVICE_ID":"YOUR_3SCALE_SERVICE_ID",
-    "ELASTICACHE_ENDPOINT":"YOUR_ELASTICACHE_ENDPOINT",
-    "ELASTICACHE_PORT":6379
+    "THREESCALE_PROVIDER_KEY": "YOUR_3SCALE_PROVIDER_KEY",
+    "THREESCALE_SERVICE_ID": "YOUR_3SCALE_SERVICE_ID",
+    "ELASTICACHE_ENDPOINT": "${elastiCacheEndpoint}",
+    "ELASTICACHE_PORT": 6379,
+    "SNS_TOPIC_ARN":"${snsTopic}"
   },
   "vpc": {
-    "securityGroupIds": [""],
-    "subnetIds": [""]
+    "securityGroupIds": [
+      "${vpcSecurityGroup}"
+    ],
+    "subnetIds": [
+      "${privateSubnetId1}","${privateSubnetId2}"
+    ]
   }
 }
