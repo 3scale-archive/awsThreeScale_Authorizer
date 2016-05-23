@@ -1,1 +1,5 @@
-{}
+{
+    "type": "TOKEN",
+    "authorizationToken": "8c565fc0e40a42afee246f84e5359df5",
+    "methodArn": "arn:aws:execute-api:us-east-1:125661084241:509bea5d1c/dev/GET/greetings"
+}

@@ -40,7 +40,8 @@
       "${vpcSecurityGroup}"
     ],
     "subnetIds": [
-      "${privateSubnetId1}","${privateSubnetId2}"
+      "${privateSubnetId1}",
+      "${privateSubnetId2}"
     ]
   }
 }

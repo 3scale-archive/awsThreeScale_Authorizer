@@ -50,13 +50,15 @@
               "Resource": "*"
             },
             {
-                "Effect": "Allow",
-                "Action": [
-                    "sns:Publish"
-                ],
-                "Resource": [
-                    {"Ref":"SNStopic"}
-                ]
+              "Effect": "Allow",
+              "Action": [
+                "sns:Publish"
+              ],
+              "Resource": [
+                {
+                  "Ref": "SNStopic"
+                }
+              ]
             }
           ]
         },
@@ -215,25 +217,34 @@
         "VpcId": {
           "Ref": "VPC"
         },
-        "SecurityGroupIngress" : [{
-            "IpProtocol" : "-1"
-         }],
-        "SecurityGroupEgress" : [{
-         "IpProtocol" : "-1",
-         "CidrIp": "0.0.0.0/0"
-        }]
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "-1"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
       }
     },
-    "InternalSecurityGroup2" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "VpcId" : {"Ref" : "VPC"},
-        "GroupDescription" : "Allow the machines in this group to share all kinds of traffic between each other",
-        "SecurityGroupIngress" : [ {
-            "IpProtocol" : "-1",
+    "InternalSecurityGroup2": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "GroupDescription": "Allow the machines in this group to share all kinds of traffic between each other",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "-1",
             "FromPort": "-1",
             "ToPort": "-1",
-            "SourceSecurityGroupId" : { "Ref" : "SecurityGroup" }
+            "SourceSecurityGroupId": {
+              "Ref": "SecurityGroup"
+            }
           }
         ]
       }
@@ -260,7 +271,9 @@
           "Ref": "CacheSubnetGroup"
         },
         "VpcSecurityGroupIds": [
-             {"Ref":"InternalSecurityGroup2"}
+          {
+            "Ref": "InternalSecurityGroup2"
+          }
         ]
       },
       "DependsOn": [
@@ -284,7 +297,7 @@
         ]
       }
     },
-    "ElastiCacheEndpoint":{
+    "ElastiCacheEndpoint": {
       "Description": "Endpoint URL of the Elasticacache created",
       "Value": {
         "Fn::GetAtt": [
@@ -293,31 +306,31 @@
         ]
       }
     },
-    "vpcSecurityGroup":{
+    "vpcSecurityGroup": {
       "Description": "Id of the SecurityGroup",
-      "Value":{
+      "Value": {
         "Fn::GetAtt": [
           "SecurityGroup",
           "GroupId"
         ]
       }
     },
-    "privateSubnetId1":{
+    "privateSubnetId1": {
       "Description": "Id of the PrivateSubnet1",
-      "Value":{
+      "Value": {
         "Ref": "PrivateSubnet1"
       }
     },
-    "privateSubnetId2":{
+    "privateSubnetId2": {
       "Description": "Id of the f",
-      "Value":{
+      "Value": {
         "Ref": "PrivateSubnet2"
       }
     },
-    "snsTopic":{
+    "snsTopic": {
       "Description": "ARN of SNS topic",
-      "Value":{
-        "Ref":"SNStopic"
+      "Value": {
+        "Ref": "SNStopic"
       }
     }
   }

@@ -22,18 +22,25 @@
     "SERVERLESS_PROJECT": "${project}",
     "SERVERLESS_STAGE": "${stage}",
     "SERVERLESS_REGION": "${region}",
-    "THREESCALE_PROVIDER_KEY": "YOUR_3SCALE_PROVIDER_KEY",
-    "THREESCALE_SERVICE_ID": "YOUR_3SCALE_SERVICE_ID",
+    "THREESCALE_PROVIDER_KEY": "THREESCALE_PROVIDER_KEY",
+    "SERVICES_MAP": [
+      {
+        "aws_gateway_id": "509bea5d1c",
+        "stage": "dev",
+        "threescale_service_id": "2555417731327"
+      }
+    ],
     "ELASTICACHE_ENDPOINT": "${elastiCacheEndpoint}",
     "ELASTICACHE_PORT": 6379,
-    "SNS_TOPIC_ARN":"${snsTopic}"
+    "SNS_TOPIC_ARN": "${snsTopic}"
   },
   "vpc": {
     "securityGroupIds": [
       "${vpcSecurityGroup}"
     ],
     "subnetIds": [
-      "${privateSubnetId1}","${privateSubnetId2}"
+      "${privateSubnetId1}",
+      "${privateSubnetId2}"
     ]
   }
 }

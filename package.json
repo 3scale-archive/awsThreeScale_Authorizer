@@ -1,12 +1,12 @@
 {
-  "name": "sls-threeScale-Authorizer",
+  "name": "sls-threeScale-nico-multiservice",
   "version": "0.0.1",
   "description": "A Serverless Project and its Serverless Plugin dependencies.",
   "author": "me",
   "license": "MIT",
   "private": false,
-  "scripts":{
-    "postinstall":"./configure"
+  "scripts": {
+    "postinstall": "./configure"
   },
   "repository": {
     "type": "git",

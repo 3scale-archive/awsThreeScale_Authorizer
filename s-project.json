@@ -1,5 +1,7 @@
 {
-  "name": "sls-threeScale-Authorizer",
+  "name": "sls-threeScale-nico-multiservice",
   "custom": {},
-  "plugins": [ "serverless-optimizer-plugin"]
+  "plugins": [
+    "serverless-optimizer-plugin"
+  ]
 }
