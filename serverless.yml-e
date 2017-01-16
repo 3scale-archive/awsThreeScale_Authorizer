@@ -1,0 +1,289 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: authorizer150
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+  region: us-east-1
+  profile: 3scale
+  iamRoleStatements:
+    $ref: ./iamRoleStatements.json
+  vpc:
+    securityGroupIds:
+     - 'Fn::GetAtt': SecurityGroup.GroupId
+    subnetIds:
+     - Ref: PrivateSubnet1
+     - Ref: PrivateSubnet2
+  environment:
+   SERVERLESS_REGION: ${self:provider.region}
+   THREESCALE_PROVIDER_KEY: "YOUR_THREESCALE_PROVIDER_KEY"
+   THREESCALE_SERVICE_ID: "2555417731327"
+   ELASTICACHE_ENDPOINT:
+     Fn::GetAtt:
+       - elasticCache
+       - RedisEndpoint.Address
+   ELASTICACHE_PORT: 6379
+   SNS_TOPIC_ARN:
+     Ref: SNStopic
+
+functions:
+  authorizer:
+    handler: handler.authorizer
+  authRepAsync:
+    handler: handler.authRepAsync
+    events:
+      - sns: "${env:SNS_TOPIC_ARN}"
+
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - http:
+#          path: users/create
+#          method: get
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+
+# you can add CloudFormation resource templates here
+resources:
+ Resources:
+  IamRoleLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+  IamPolicyLambda:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "${opt:stage,self:provider.stage}-${self:service}-lambda"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          Resource: arn:aws:logs:${self:provider.region}:*:*
+        - Effect: Allow
+          Action:
+          - ec2:CreateNetworkInterface
+          - ec2:DescribeNetworkInterfaces
+          - ec2:DeleteNetworkInterface
+          Resource: "*"
+        - Effect: Allow
+          Action:
+          - sns:Publish
+          Resource:
+          - Ref: SNStopic
+      Roles:
+      - Ref: IamRoleLambda
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.0.0/24
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.1.0/24
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.2.0/24
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  InternetGatewayAssociation:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: VPC
+      InternetGatewayId:
+        Ref: InternetGateway
+  IPAddress:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAssociation
+    Properties:
+      Domain: vpc
+  NAT:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+        - IPAddress
+        - AllocationId
+      SubnetId:
+        Ref: PublicSubnet
+  igRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+  igRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: igRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet
+      RouteTableId:
+        Ref: igRouteTable
+  natRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+  natRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: natRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NAT
+  PrivateSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet1
+      RouteTableId:
+        Ref: natRouteTable
+  PrivateSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet2
+      RouteTableId:
+        Ref: natRouteTable
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Limits security group egress traffic
+      VpcId:
+        Ref: VPC
+      SecurityGroupIngress:
+      - IpProtocol: "-1"
+      SecurityGroupEgress:
+      - IpProtocol: "-1"
+        CidrIp: 0.0.0.0/0
+  InternalSecurityGroup2:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Ref: VPC
+      GroupDescription: Allow the machines in this group to share all kinds of traffic
+        between each other
+      SecurityGroupIngress:
+      - IpProtocol: "-1"
+        FromPort: "-1"
+        ToPort: "-1"
+        SourceSecurityGroupId:
+          Ref: SecurityGroup
+  CacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Cache Subnet Group
+      SubnetIds:
+      - Ref: PublicSubnet
+  elasticCache:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      AutoMinorVersionUpgrade: 'true'
+      Engine: redis
+      CacheNodeType: cache.t2.micro
+      NumCacheNodes: '1'
+      CacheSubnetGroupName:
+        Ref: CacheSubnetGroup
+      VpcSecurityGroupIds:
+      - Ref: InternalSecurityGroup2
+    DependsOn:
+    - VPC
+  SNStopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: "${opt:stage, self:provider.stage}-${self:service}-threescaleAsync"
+
+ Outputs:
+    IamRoleArnLambda:
+      Description: ARN of the lambda IAM role
+      Value:
+        Fn::GetAtt:
+          - IamRoleLambda
+          - Arn
+    ElastiCacheEndpoint:
+      Description: Endpoint URL of the Elasticacache created
+      Value:
+        Fn::GetAtt:
+          - elasticCache
+          - RedisEndpoint.Address
+    vpcSecurityGroup:
+      Description: Id of the SecurityGroup
+      Value:
+        Fn::GetAtt:
+          - SecurityGroup
+          - GroupId
+    privateSubnetId1:
+      Description: Id of the PrivateSubnet1
+      Value:
+        Ref: PrivateSubnet1
+    privateSubnetId2:
+      Description: Id of the PrivateSubnet1
+      Value:
+        Ref: PrivateSubnet2
+    snsTopic:
+      Description: ARN of SNS topic
+      Value:
+        Ref: SNStopic
+
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"
