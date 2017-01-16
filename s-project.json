@@ -1,5 +1,0 @@
-{
-  "name": "sls-threeScale-Authorizer",
-  "custom": {},
-  "plugins": [ "serverless-optimizer-plugin"]
-}

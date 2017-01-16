@@ -1,4 +1,0 @@
-cd authorizer
-npm install
-cd ../authrepAsync
-npm install

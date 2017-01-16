@@ -1,16 +1,12 @@
 {
-  "name": "authorizer",
+  "name": "awsThreeScale_Authorizer",
   "version": "1.0.0",
-  "description": "",
+  "description": "Custom authorizer for 3scale API management solution integrated to AWS API Gateway",
   "main": "handler.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
+  "scripts": {},
+  "author": "Nicolas Grenié - @picsoung",
+  "license": "",
   "dependencies": {
-    "3scale": "^0.7.2",
-    "q": "^1.4.1",
     "3scale": "^0.7.2",
     "q": "^1.4.1",
     "redis": "^2.5.3",
