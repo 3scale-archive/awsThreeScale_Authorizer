@@ -14,9 +14,11 @@
 service: ThreeScale
 
 provider:
+  profile: 3scale
   name: aws
   runtime: nodejs4.3
   region: us-east-1 #CHANGE IT TO YOUR OWN
+  stage: dev
   iamRoleStatements:
     $ref: ./iamRoleStatements.json
   vpc:
@@ -25,25 +27,19 @@ provider:
     subnetIds:
      - Ref: PrivateSubnet1
      - Ref: PrivateSubnet2
+
   environment:
-   SERVERLESS_REGION: ${self:provider.region}
-   THREESCALE_PROVIDER_KEY: "YOUR_THREESCALE_PROVIDER_KEY" #CHANGE IT TO YOUR OWN
-   THREESCALE_SERVICE_ID: "YOUR_THREESCALE_SERVICE_ID" #CHANGE IT TO YOUR OWN
+   SERVERLESS_REGION: "${self:provider.region}"
+   THREESCALE_PROVIDER_KEY: "YOUR_PROVIDER_KEY"
+   THREESCALE_SERVICE_TOKEN: "YOUR_SERVICE_TOKEN" #CHANGE IT TO YOUR OWN
+   THREESCALE_SERVICE_ID: "YOUR_SERVICE_ID" #CHANGE IT TO YOUR OWN
+   THREESCALE_AUTH_TYPE: "OAUTH"
+   IDP_URL: "http://ec2-107-22-51-90.compute-1.amazonaws.com:8090/auth/realms/demo/protocol/openid-connect/token"
    ELASTICACHE_ENDPOINT:
      Fn::GetAtt:
        - elasticCache
        - RedisEndpoint.Address
    ELASTICACHE_PORT: 6379
-   SNS_TOPIC_ARN:
-     Ref: SNStopic
-
-functions:
-  authorizer:
-    handler: handler.authorizer
-  authRepAsync:
-    handler: handler.authRepAsync
-    events:
-      - sns: "${env:SNS_TOPIC_ARN}"
 
 # CloudFormation resource templates
 resources:
@@ -84,7 +80,8 @@ resources:
           Action:
           - sns:Publish
           Resource:
-          - Ref: SNStopic
+          - Ref: SNSAuthRepTopic
+          - Ref: SNSCacheTokenTopic
       Roles:
       - Ref: IamRoleLambda
   VPC:
@@ -222,10 +219,14 @@ resources:
       - Ref: InternalSecurityGroup2
     DependsOn:
     - VPC
-  SNStopic:
+  SNSAuthRepTopic:
     Type: AWS::SNS::Topic
     Properties:
-      TopicName: "${opt:stage, self:provider.stage}-${self:service}-threescaleAsync"
+      TopicName: "${opt:stage, self:provider.stage}-${self:service}-threescaleAuthRepAsync"
+  SNSCacheTokenTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: "${opt:stage, self:provider.stage}-${self:service}-threescaleCacheTokenAsync"
 
  Outputs:
     IamRoleArnLambda:
@@ -254,7 +255,41 @@ resources:
       Description: Id of the PrivateSubnet1
       Value:
         Ref: PrivateSubnet2
-    snsTopic:
-      Description: ARN of SNS topic
+    snsAuthRepTopic:
+      Description: ARN of SNS topic for AuthRrep Async
       Value:
-        Ref: SNStopic
+        Ref: SNSAuthRepTopic
+    snsCacheTokenTopic:
+      Description: ARN of SNS topic for CacheToken Async
+      Value:
+        Ref: SNSCacheTokenTopic
+
+
+custom:
+  AWS_ACCOUNTID: "YOUR_AWS_ACCOUNT_ID" #change it to REF ?
+
+functions:
+  authorizer:
+    handler: handler.authorizer
+    environment:
+      SNS_AUTHREP_ARN: "arn:aws:sns:${self:provider.region}:${self:custom.AWS_ACCOUNTID}:${opt:stage, self:provider.stage}-${self:service}-threescaleAuthRepAsync"
+  authRepAsync:
+    handler: handler.authRepAsync
+    events:
+      - sns: "arn:aws:sns:${self:provider.region}:${self:custom.AWS_ACCOUNTID}:${opt:stage, self:provider.stage}-${self:service}-threescaleAuthRepAsync"
+  getToken:
+    handler: oauth.getToken
+    events:
+      - http:
+          path: oauth/token
+          method: post
+    environment:
+      SNS_OAUTH_SYNC_ARN: "arn:aws:sns:${self:provider.region}:${self:custom.AWS_ACCOUNTID}:${opt:stage, self:provider.stage}-${self:service}-threescaleCacheTokenAsync"
+  storeInCacheAsync:
+    handler: oauth.storeInCacheAsync
+    events:
+      - sns: "arn:aws:sns:${self:provider.region}:${self:custom.AWS_ACCOUNTID}:${opt:stage, self:provider.stage}-${self:service}-threescaleCacheTokenAsync"
+  storeOnThreescaleAsync:
+    handler: oauth.storeOnThreescaleAsync
+    events:
+      - sns: "arn:aws:sns:${self:provider.region}:${self:custom.AWS_ACCOUNTID}:${opt:stage, self:provider.stage}-${self:service}-threescaleCacheTokenAsync"

@@ -23,7 +23,16 @@
           "sns:Publish"
       ],
       "Resource": [
-          {"Ref":"SNStopic"}
+          {"Ref":"SNSAuthRepTopic"}
+      ]
+  },
+  {
+      "Effect": "Allow",
+      "Action": [
+          "sns:Publish"
+      ],
+      "Resource": [
+          {"Ref":"SNSCacheTokenTopic"}
       ]
   }
 ]
