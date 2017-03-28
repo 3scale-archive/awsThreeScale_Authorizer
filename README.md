@@ -10,6 +10,6 @@
 ![3scale Custom Authorizer FirstCall](https://raw.githubusercontent.com/ManfredBo/talks/master/awsLoftLondon/img/AAG-Custom-Authorizer-FirstCall.PNG)
 
 ## HowTo
-Check the [dedicated tutorial](https://github.com/picsoung/talks/tree/master/awsLoftLondon)
+Check the [dedicated tutorial](https://support.3scale.net/guides/infrastructure/aws-lambda-amazon-api-gateway)
 
 Built using [Serveless](http://serverless.com) framework for Lambda.
