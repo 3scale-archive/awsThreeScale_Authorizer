@@ -8,8 +8,9 @@
   "license": "",
   "dependencies": {
     "3scale": "^0.7.2",
+    "bluebird": "^3.5.0",
     "q": "^1.4.1",
-    "redis": "^2.5.3",
+    "redis": "^2.7.1",
     "redis-commands": "^1.1.0",
     "request": "^2.71.0",
     "then-redis": "^2.0.0",

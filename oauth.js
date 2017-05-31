@@ -3,20 +3,25 @@
 var Q = require('q');
 var request = Q.denodeify(require("request"));
 var xml2js = require('xml2js');
+var bluebird = require('bluebird');
 
+/* AWS */
 var AWS = require('aws-sdk');
 AWS.config.region = process.env.AWS_REGION;
 
-var Client = require('3scale').Client;
-var createClient = require('then-redis').createClient
+/* Connect to Redis Elasticache */
+var redis = require("redis");
+var db = redis.createClient({
+       host: process.env.ELASTICACHE_ENDPOINT,
+       port: process.env.ELASTICACHE_PORT
+     });
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
 
+/* Configure 3scale */
+var Client = require('3scale').Client;
 var client = new Client({host:"su1.3scale.net"});
 var service_id = process.env.THREESCALE_SERVICE_ID
-
-var db = createClient({
-  host: process.env.ELASTICACHE_ENDPOINT,
-  port: process.env.ELASTICACHE_PORT
-});
 
 module.exports.getToken = (event, context, callback) => {
   console.log('Received event:', JSON.stringify(event, null, 2));
@@ -172,5 +177,8 @@ function storeTokenOnThreescale(app_id, access_token, ttl){
 
 function storeTokenInCache(app_id, access_token, ttl) {
   console.log("Store in cache called")
-  return db.set(access_token,app_id)
+  return db.setAsync(access_token,app_id).then(function(result){
+    console.log("RESULT", result)
+    return db.expireAsync(access_token,ttl)
+  })
 }
