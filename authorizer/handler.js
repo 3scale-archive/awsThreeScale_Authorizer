@@ -127,18 +127,18 @@ var generatePolicy = function(principalId, effect, resource) {
 }
 
 var extractARN = function(ARN){
-  //arn:aws:execute-api:us-east-1:125661084241:ac66xzfuhj/dev/GET/greetings
-  var slash = ARN.split('/')
-  var splitedARN = slash[0].split(':')
-  var gatewayId = splitedARN[splitedARN.length-1]
-  var stage = slash[1]
-  var method = slash[2]
-  var resourcePath =  ARN.slice(ARN.indexOf('/'+slash[3]),ARN.length)
+  // AWS Gateway ARN format: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-apigateway
+  // Example: arn:aws:execute-api:us-east-1:125661084241:ac66xzfuhj/dev/GET/api/v1/hello
+  var ARN_PATTERN = /arn:aws:.*:.*:.*:(\w+)\/(\w+)\/(\w+)\/(.*)/g
+  var parts = ARN_PATTERN.exec(arn);
+  if (parts == null) {
+    throw new Error('ARN ['+arn+'] did not match pattern!');
+  }
   return {
-    "gateway_id": gatewayId,
-    "stage": stage,
-    "method": method,
-    "path":resourcePath
+    "gateway_id": parts[1],
+    "stage": parts[2],
+    "method": parts[3],
+    "path": parts[4]
   }
 }
 
