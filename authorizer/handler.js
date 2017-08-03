@@ -126,7 +126,7 @@ var generatePolicy = function(principalId, effect, resource) {
     return authResponse;
 }
 
-var extractARN = function(ARN){
+var extractARN = function(arn){
   // AWS Gateway ARN format: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-apigateway
   // Example: arn:aws:execute-api:us-east-1:125661084241:ac66xzfuhj/dev/GET/api/v1/hello
   var ARN_PATTERN = /arn:aws:.*:.*:.*:(\w+)\/(\w+)\/(\w+)\/(.*)/g
