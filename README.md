@@ -1,4 +1,4 @@
-#3scale custom Authorizer for AWS API Gateway
+# 3scale custom Authorizer for AWS API Gateway
 
 
 ## Description
@@ -10,6 +10,6 @@
 ![3scale Custom Authorizer FirstCall](https://raw.githubusercontent.com/ManfredBo/talks/master/awsLoftLondon/img/AAG-Custom-Authorizer-FirstCall.PNG)
 
 ## HowTo
-Check the [dedicated tutorial](https://support.3scale.net/guides/infrastructure/aws-lambda-amazon-api-gateway)
+Check the [dedicated tutorial](/docs/aws-lambda-amazon-api-gateway.md)
 
 Built using [Serveless](http://serverless.com) framework for Lambda.
